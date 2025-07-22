@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>什么是对象存储OSS</title>
+    <!-- 测试页面内容样式 -->
+    <link rel="icon" href="https://img.alicdn.com/tfs/TB1_ZXuNcfpK1RjSZFOXXa6nFXa-32-32.ico" type="image/x-icon" />
+    <link
+      href="//g.alicdn.com/??aliyun/dbl-official-ui/2.0.1/css/index.css,dawn/ace-element/0.0.60/index.css,hmod/ace-grid-layout-2023/0.0.5/index.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="https://img.alicdn.com/tfs/TB1_ZXuNcfpK1RjSZFOXXa6nFXa-32-32.ico" type="image/x-icon">
+    <link href="//g.alicdn.com/aliyun-help/help-portal-fe/0.9.44/css/index.css" rel="stylesheet">
+    <link href="//g.alicdn.com/hmod/ace-homepage-2020-hmod-footer/0.1.5/index.css" rel="stylesheet"/>
+    <link href="//g.alicdn.com/code/npm/@ali??hmod-ace-2023-box/0.1.0/index.css,hmod-ace-2023-service-contact-us/0.0.25/index.css,hmod-aliyun-com-floating-toolbar/0.1.6/index.css,hmod-aliyun-com-global-nav-search/0.5.15/index.css,hmod-aliyun-com-global-nav/0.1.31/index.css" rel="stylesheet"/>
+    <!-- AI助手线上或预发测试 -->
+    <link rel="stylesheet" crossorigin href="https://dev.g.alicdn.com/aliyun-documentation/web-chatbot-ui/0.0.17/index.css" />
+    <!-- 页面总结AI样式：注意，如移动过文件请更新路径 -->
+    <link rel="stylesheet" href="./summarize/summarize.css" />
+  </head>
+  <body>
+    <!-- 当前测试页面内容：注意，如移动过文件请更新路径 -->
+    <script src="./summarize/oss_layout.js"></script>
+    <script type="module" src="./summarize/effect.js"></script>
+    <script>
+      // 页面总结按钮的disabled状态设置
+      const setPageSummarizeButton = (disabled) => {
+        const button = document.querySelector('.webChat-footer-extra-button');
+        if (button) {
+          button.disabled = disabled;
+        }
+      }
+      const defaultPrompt = '总结当前页面内容';
+      window.CHATBOT_CONFIG = {
+        draggable: true, // 是否开启拖拽
+        endpoint: '/chat', // AI助手服务端地址
+        feedBackConfig: {
+          like: {
+            // hide: true, // 是否隐藏点赞 true表示隐藏
+            // onClick: (props) => {
+            //   console.log('点赞', props);
+            // },
+          },
+        }, // AI助手回复消息配置(feedBackConfig为空则不展示): like、disLike、copy、refresh
+        dataProcessor: {
+          /**
+           * 在向后端大模型应用发起请求前改写 Prompt。
+           * 可以用于总结网页场景，在发送前将网页内容包含在内，同时避免在前端显示这些内容。
+           * @param {string} prompt - 用户输入的 Prompt
+           */
+          rewritePrompt(prompt) {
+            if (prompt === defaultPrompt ) {
+              // 总结页面内容时，将页面内容注入到 Prompt 中
+              const pageContentDom = document.getElementById('concept-ybr-fg1-tdb');
+              return `请使用中文总结以下内容：\n\n------\n\n${pageContentDom?.outerText}`;
+            }
+            return prompt;
+          }
+        },
+        // 自定义取值参考：https://docs.nlkit.com/nlux/reference/ui/ai-chat
+        aiChatOptions: {
+          className: 'summarize-ai-chat',
+          personaOptions: {
+            assistant: {
+              avatar: 'https://help-static-aliyun-doc.aliyuncs.com/demos/ai-assistant-logo.gif',
+            },
+            user: {
+              avatar: 'https://oss.aliyuncs.com/aliyun_id_photo_bucket/default_handsome.jpg',
+            }
+          },
+          composerOptions: {
+            placeholder: '请将您遇到的问题告诉我', // 消息输入框提示
+            hideStopButton: true
+          },
+          events: {
+            messageSent: () => {
+              setPageSummarizeButton(true); // 消息发送时将页面总结按钮置灰
+            },
+            messageReceived: () => {
+              setPageSummarizeButton(false); // 消息接收完毕时重置页面总结按钮
+            }
+          },
+          // 可配置快捷入口列表
+          conversationOptions: {
+            conversationStarters: [
+              {prompt: defaultPrompt},
+              {prompt: '为什么说弹性是云的最大优势?'},
+              {prompt: '为什么选择阿里云？'},
+            ],
+            layout: 'bubbles',
+          },
+        },
+        customRenderOptions: {
+          // 类官网欢迎页面配置: greetingOptions为空则使用默认欢迎页面
+          greetingOptions: {
+            greeting: '你好, 我是',
+            name: 'AI助手',
+            quickStartItemClick: ({api, item}) => {
+              console.log('点击了快速入口');
+              api?.composer && api.composer.send(item?.prompt);
+            }
+          },
+          // onInit AI助手初始化时执行
+          onInit: (params) => {
+            const { api } = params || {};
+            // 在聊天框上方添加一个按钮（默认为页面总结按钮）
+            const extraButton = document.querySelector('.webChat-footer-extra');
+            const footer = document.querySelector('.nlux-composer-container');
+            if (!footer || extraButton) return;
+            const footerParent = footer.parentElement;
+
+            const newDiv = document.createElement('div');
+            newDiv.className = 'webChat-footer-extra';
+
+            const button = document.createElement('button');
+            button.innerHTML = '页面总结';
+            button.className = 'webChat-footer-extra-button';
+            button.onclick = () => {
+              if (api?.composer) {
+                api.composer.send('总结当前页面内容');
+              }
+            }
+            newDiv.appendChild(button);
+
+            footerParent && footerParent.insertBefore(newDiv, footer);
+          },
+          stopButtonClass: 'summarize-stop-button', // 为停止按钮添加一个类名
+          onChatbotRefresh: () => {
+            setPageSummarizeButton(false); // 点击聊天框顶部刷新按钮时重置页面总结按钮
+          }
+        }
+      };
+    </script>
+    <!-- 本地测试 -->
+    <!-- <script type="module" src="/src/main.tsx"></script> -->
+    <!-- 线上或预发测试 -->
+    <script type="module" crossorigin src="https://dev.g.alicdn.com/aliyun-documentation/web-chatbot-ui/0.0.17/index.js"></script>
+    <style>
+      :root {
+        --webchat-toolbar-background-color: #fff;
+        --webchat-toolbar-text-color: #333;
+      }
+      .webchat-container {
+        z-index: 100;
+        bottom: 10px;
+        right: 10px;
+      }
+      .webchat-bubble-tip {
+        z-index: 99;
+        bottom: 20px;
+        right: 20px;
+      }
+    </style>
+  </body>
+</html>

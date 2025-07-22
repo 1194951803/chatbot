@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="https://img.alicdn.com/tfs/TB1_ZXuNcfpK1RjSZFOXXa6nFXa-32-32.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 助手</title>
+  </head>
+  <body>
+    <!-- <script src="demo_layout.js"></script> -->
+    <div id="ballChat"></div>
+    <script>
+      window.CHATBOT_CONFIG = {
+        title: "数智员工",
+        endpoint: 'http://localhost:8088/ai/api/chatbot/chat',
+        displayByDefault: false, // 默认不展示 AI 助手聊天框
+        draggable: false, // 是否开启拖拽
+        aiChatOptions: { // aiChatOptions 中 options 会传递 aiChat 组件，自定义取值参考：https://docs.nlkit.com/nlux/reference/ui/ai-chat
+          conversationOptions: { // 自定义取值参考：https://docs.nlkit.com/nlux/reference/ui/ai-chat#conversation-options
+            conversationStarters: [
+              {prompt: '忘记密码怎么办?'},
+              {prompt: '数据导入失败怎么办?'},
+              {prompt: '怎么创建民主测评项目?'},
+              {prompt: '联系人工客服'},
+            ]
+          },
+          displayOptions: { // 自定义取值参考：https://docs.nlkit.com/nlux/reference/ui/ai-chat#display-options
+            height: 600,
+            // width: 400,
+          },
+          personaOptions: { // 自定义取值参考：https://docs.nlkit.com/nlux/reference/ui/ai-chat#chat-personas
+            assistant: {
+              name: '你好，我是你的 AI 助手',
+              // AI 助手的图标
+              avatar: 'https://img.alicdn.com/imgextra/i2/O1CN01Pda9nq1YDV0mnZ31H_!!6000000003025-54-tps-120-120.apng',
+              tagline: '您可以尝试点击下方的快捷入口开启体验！',
+            }
+          },
+          messageOptions: {
+            waitTimeBeforeStreamCompletion : 'never',	// 连接超时设置，默认是2000
+          },
+        },
+        feedBackConfig: {},
+        dataProcessor: {
+          /**
+           * 在向后端大模型应用发起请求前改写 Prompt。
+           * 可以用于总结网页场景，在发送前将网页内容包含在内，同时避免在前端显示这些内容。
+           * @param {string} prompt - 用户输入的 Prompt
+           */
+          rewritePrompt(prompt) {
+            return prompt;
+          }
+        }
+      };
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+    <style>
+      :root {
+        /* webchat 工具栏的颜色 */
+        --webchat-toolbar-background-color: #1464E4;
+        /* webchat 工具栏文字和按钮的颜色 */
+        --webchat-toolbar-text-color: #FFF;
+      }
+      /* webchat 对话框如果被遮挡，可以尝试通过 z-index、bottom、right 等设置 来调整*/
+      .webchat-container {
+        z-index: 100;
+        bottom: 10px;
+        right: 10px;
+      }
+      /* webchat 的唤起按钮如果被遮挡，可以尝试通过 z-index、bottom、right 等设置 来调整*/
+      .webchat-bubble-tip {
+        z-index: 99;
+        bottom: 20px;
+        right: 20px;
+        height: 120px;
+      }
+    </style>
+    <style>
+      #ballChat {
+        width: 120px;
+        height: 120px;
+        border: 1px solid #1464E4;
+      }
+    </style>
+  </body>
+</html>

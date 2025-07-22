@@ -1,0 +1,57 @@
+/* 回复消息底部布局 */
+.chat-message-item {
+  .nlux-markdown-container {
+    ol > li {
+      list-style-type: inherit !important;
+      list-style-position: inside !important
+    }
+    ul > li {
+      list-style-type: inherit!important;
+      list-style-position: inside!important
+    }
+  }
+  .chat-message-item-footer {
+    margin: 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  .chat-message-item-footer-left {
+    & > span {
+      margin-right: 8px;
+    }
+  }
+  .chat-message-item-icon {
+    display: inline-flex;
+    padding: 4px;
+    cursor: pointer;
+    &:hover {
+      background-color: #E5EFFE;
+    }
+  }
+}
+/* 回复消息底部的操作按钮显示及隐藏 */
+.nlux-chatSegment.nlux-chatSegment--complete {
+  .chat-message-item-footer {
+    /* visibility: hidden; */
+    display: none;
+    .chat-message-item-footer-right .chat-message-item-icon {
+      /* visibility: hidden; */
+      display: none;
+    }
+  }
+}
+.nlux-chatSegment.nlux-chatSegment--complete:hover {
+  .chat-message-item-footer {
+    /* visibility: visible; */
+    display: none;
+  }
+}
+.nlux-chatSegment.nlux-chatSegment--complete:last-child {
+  .chat-message-item-footer {
+    visibility: visible;
+    display: flex;
+    .chat-message-item-footer-right .chat-message-item-icon {
+      visibility: visible;
+    }
+  }
+}
